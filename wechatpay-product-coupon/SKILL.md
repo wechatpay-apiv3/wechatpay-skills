@@ -89,5 +89,5 @@ version: "1.0"
 
 在使用过程中遇到问题、有改进建议，或者想和其他开发者交流接入经验，欢迎扫码添加企业微信进群，与官方团队和社区开发者一起讨论：
 
-<img src="./assets/qrcode.jpg" alt="微信支付 Skills 交流群二维码" width="400">
+![微信支付 Skills 交流群二维码](https://raw.githubusercontent.com/wechatpay-apiv3/wechatpay-skills/main/wechatpay-product-coupon/assets/qrcode.jpg)
 
