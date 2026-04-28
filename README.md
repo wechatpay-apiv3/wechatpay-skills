@@ -21,4 +21,4 @@
 ## 交流与反馈
 
 在使用过程中遇到问题、有改进建议，或者想和其他开发者交流接入经验，欢迎扫码加入 **微信支付 Skills 交流群**，与官方团队和社区开发者一起讨论：
-<img width="400" height="653" alt="3faceb8ea7e9eb96f219516385417f6d" src="https://github.com/user-attachments/assets/9769e10b-0dc3-4ef7-acb0-6701621c9123" />
+<img width="400" height="653" alt="8903070e5cfb17de21ca6f052c91e067" src="https://github.com/user-attachments/assets/a0f442ee-63a0-4140-93a1-3a7d24bbfe4c" />
