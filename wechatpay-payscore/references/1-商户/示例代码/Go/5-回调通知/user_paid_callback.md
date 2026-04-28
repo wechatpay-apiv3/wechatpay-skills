@@ -1,0 +1,48 @@
+# 支付成功回调通知（商户 - Go）
+
+> 内容与 [`Java/5-回调通知/支付成功回调通知说明.md`](../../Java/5-回调通知/支付成功回调通知说明.md) 完全一致；本副本仅为 Go 项目按目录约定查找方便而存在。
+
+> 源文档：[支付成功回调通知](https://pay.weixin.qq.com/doc/v3/merchant/4012587960.md)
+> 通用解密 / 验签 / 回包流程：[../接入指南/回调处理.md](../../../接入指南/回调处理.md)
+
+## 触发场景
+
+完结订单（`/v3/payscore/serviceorder/{out_order_no}/complete`）后，若订单 `need_collection = true`（需收款），微信支付分将异步发起代扣并在扣款 / 收款进展变化时回推本通知。商户需以本通知为准更新「收款（collection）」状态。
+
+## 回调报文骨架
+
+```json
+{
+  "id": "EV-2018022511223320873",
+  "create_time": "2015-05-20T13:29:35+08:00",
+  "resource_type": "encrypt-resource",
+  "event_type": "PAYSCORE.USER_PAID",
+  "summary": "用户支付成功",
+  "resource": {
+    "original_type": "payscore",
+    "algorithm": "AEAD_AES_256_GCM",
+    "ciphertext": "<密文，使用商户 APIv3 密钥 + AEAD_AES_256_GCM 解密后得到 ServiceOrderEntity>",
+    "associated_data": "transaction",
+    "nonce": "<随机串>"
+  }
+}
+```
+
+## 关键字段
+
+| 字段 | 说明 |
+|------|------|
+| `event_type` | 固定为 `PAYSCORE.USER_PAID` |
+| 解密后 `state` | `DONE` |
+| 解密后 `collection.state` | `USER_PAYING` / `USER_ACCEPT` / `MCH_LOADING`，最终态多为 `USER_PAID` |
+| 解密后 `collection.details[]` | 每一笔扣款明细：`amount`、`paid_type`、`paid_time`、`transaction_id` |
+
+## 商户处理要求
+
+1. **验签 + 解密**：流程同确认订单回调。
+2. **路由 / 幂等**：以 `event_type = PAYSCORE.USER_PAID` 区分，按 `out_order_no` 幂等。
+3. **状态机**：
+   - `collection.state` 在终态前可能多次回推（多笔代扣 / 退回 / 重试），商户需累加 `paid_amount`、写入流水表，避免覆盖。
+   - 终态 `state = DONE` 且 `collection.paid_amount` 与 `total_amount` 一致时方可计完结。
+4. **资金对账**：以 `transaction_id` 为唯一支付单号入账；如需分账，按业务发起 `/v3/profitsharing/orders`。
+5. **应答**：成功返回 `200 + {"code":"SUCCESS","message":"成功"}`，否则返回 5xx + 错误描述触发重试。
