@@ -12,10 +12,10 @@ import (
 func main() {
 	// TODO: 请准备商户开发必要参数，参考：https://pay.weixin.qq.com/doc/v3/merchant/4013070756
 	config, err := wxpay_utility.CreateMchConfig(
-		"19xxxxxxxx",                 // 商户号，是由微信支付系统生成并分配给每个商户的唯一标识符，商户号获取方式参考 https://pay.weixin.qq.com/doc/v3/merchant/4013070756
-		"1DDE55AD98Exxxxxxxxxx",      // 商户API证书序列号，如何获取请参考 https://pay.weixin.qq.com/doc/v3/merchant/4013053053
+		"YOUR_MCHID",                 // 商户号，是由微信支付系统生成并分配给每个商户的唯一标识符，商户号获取方式参考 https://pay.weixin.qq.com/doc/v3/merchant/4013070756
+		"YOUR_CERT_SERIAL_NO",      // 商户API证书序列号，如何获取请参考 https://pay.weixin.qq.com/doc/v3/merchant/4013053053
 		"/path/to/apiclient_key.pem", // 商户API证书私钥文件路径，本地文件路径
-		"PUB_KEY_ID_xxxxxxxxxxxxx",   // 微信支付公钥ID，如何获取请参考 https://pay.weixin.qq.com/doc/v3/merchant/4013038816
+		"YOUR_PUB_KEY_ID",   // 微信支付公钥ID，如何获取请参考 https://pay.weixin.qq.com/doc/v3/merchant/4013038816
 		"/path/to/wxp_pub.pem",       // 微信支付公钥文件路径，本地文件路径
 	)
 	if err != nil {
@@ -30,8 +30,8 @@ func main() {
 	request := &CreateOrderRequest{
 		MixPayType: MIXPAYTYPE_CASH_AND_INSURANCE.Ptr(),
 		OrderType:  ORDERTYPE_REG_PAY.Ptr(),
-		Appid:      wxpay_utility.String("wxdace645e0bc2cXXX"),
-		Openid:     wxpay_utility.String("o4GgauInH_RCEdvrrNGrntXDuXXX"),
+		Appid:      wxpay_utility.String("wxYOUR_APPID"),
+		Openid:     wxpay_utility.String("oYOUR_OPENID_EXAMPLE"),
 		Payer: &PersonIdentification{
 			Name:     wxpay_utility.String(encryptedName),
 			IdDigest: wxpay_utility.String(encryptedIdDigest),
@@ -62,7 +62,7 @@ func main() {
 			CashReduceType: CASHREDUCETYPE_DEFAULT_REDUCE_TYPE.Ptr(),
 		}},
 		CallbackUrl:   wxpay_utility.String("https://www.weixin.qq.com/wxpay/pay.php"),
-		PrepayId:      wxpay_utility.String("wx201410272009395522657a690389285100"),
+		PrepayId:      wxpay_utility.String("wxYOUR_PREPAY_ID"),
 		Attach:        wxpay_utility.String("{}"),
 		MedInsTestEnv: wxpay_utility.Bool(false),
 	}

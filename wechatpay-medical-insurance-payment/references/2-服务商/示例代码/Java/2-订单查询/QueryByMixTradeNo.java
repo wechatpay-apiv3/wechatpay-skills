@@ -26,9 +26,9 @@ public class QueryByMixTradeNo {
   public static void main(String[] args) {
     QueryByMixTradeNo client = new QueryByMixTradeNo(
       "1900000100",
-      "1DDE55AD98Exxxxxxxxxx",
+      "YOUR_CERT_SERIAL_NO",
       "/path/to/apiclient_key.pem",
-      "PUB_KEY_ID_xxxxxxxxxxxxx",
+      "YOUR_PUB_KEY_ID",
       "/path/to/wxp_pub.pem"
     );
 

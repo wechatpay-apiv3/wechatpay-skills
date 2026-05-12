@@ -35,19 +35,19 @@ public class CreatePartnerMedInsOrder {
   public static void main(String[] args) {
     CreatePartnerMedInsOrder client = new CreatePartnerMedInsOrder(
       "1900000100",                     // 服务商商户号
-      "1DDE55AD98Exxxxxxxxxx",          // 服务商 API 证书序列号
+      "YOUR_CERT_SERIAL_NO",          // 服务商 API 证书序列号
       "/path/to/apiclient_key.pem",     // 服务商 API 证书私钥路径
-      "PUB_KEY_ID_xxxxxxxxxxxxx",       // 服务商微信支付公钥 ID
+      "YOUR_PUB_KEY_ID",       // 服务商微信支付公钥 ID
       "/path/to/wxp_pub.pem"            // 服务商微信支付公钥路径
     );
 
     CreateOrderRequest request = new CreateOrderRequest();
     request.mixPayType = "CASH_AND_INSURANCE";
     request.orderType = "REG_PAY";
-    request.appid = "wxdace645e0bc2cXXX";          // 服务商 AppID
-    request.subAppid = "wxdace645e0bc2cYYY";       // 医疗机构 AppID
+    request.appid = "wxYOUR_APPID";          // 服务商 AppID
+    request.subAppid = "wxYOUR_SUB_APPID";       // 医疗机构 AppID
     request.subMchid = "1900000109";               // 医疗机构商户号
-    request.subOpenid = "o4GgauInH_RCEdvrrNGrntXDuXXX";  // 与 openid 二选一
+    request.subOpenid = "oYOUR_OPENID_EXAMPLE";  // 与 openid 二选一
     request.payer = new PersonIdentification();
     request.payer.name = client.encrypt("张三");
     request.payer.idDigest = client.encrypt("09eb26e839ff3a2e3980352ae45ef09e");
@@ -83,7 +83,7 @@ public class CreatePartnerMedInsOrder {
       request.cashReduceDetail.add(item);
     }
     request.callbackUrl = "https://www.weixin.qq.com/wxpay/pay.php";
-    request.prepayId = "wx201410272009395522657a690389285100";
+    request.prepayId = "wxYOUR_PREPAY_ID";
     request.medInsTestEnv = false;
     try {
       OrderEntity response = client.run(request);

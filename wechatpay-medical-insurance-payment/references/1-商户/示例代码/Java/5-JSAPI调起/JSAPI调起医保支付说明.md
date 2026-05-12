@@ -39,7 +39,7 @@
 <script>
 wx.config({
   debug: false,
-  appId: 'wx8888888888888888',
+  appId: 'wxYOUR_APPID',
   timestamp: 1414561699,
   nonceStr: 'XXXXXXXX',
   signature: 'XXXXXXXX',
@@ -50,11 +50,11 @@ wx.ready(function () {
   WeixinJSBridge.invoke(
     'requestMedicalInsurancePay',
     {
-      appid: 'wx8888888888888888',
+      appid: 'wxYOUR_APPID',
       mixTradeNo: '1217752501201407033233368318',
       timeStamp: '1414561699',
       nonceStr: '5K8264ILTKCH16CQ2502SI8ZNMTM67VS',
-      package: 'prepay_id=wx201410272009395522657a690389285100',
+      package: 'prepay_id=wxYOUR_PREPAY_ID',
       signType: 'RSA',
       paySign: 'oR9d8Puhn...'
     },

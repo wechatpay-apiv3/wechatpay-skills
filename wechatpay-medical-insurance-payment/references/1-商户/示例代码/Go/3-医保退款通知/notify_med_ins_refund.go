@@ -18,10 +18,10 @@ import (
 //	3) 若同时存在自费退款，请先调用 POST /v3/refund/domestic/refunds，再用相同 out_refund_no 调用本接口
 func main() {
 	config, err := wxpay_utility.CreateMchConfig(
-		"19xxxxxxxx",
-		"1DDE55AD98Exxxxxxxxxx",
+		"YOUR_MCHID",
+		"YOUR_CERT_SERIAL_NO",
 		"/path/to/apiclient_key.pem",
-		"PUB_KEY_ID_xxxxxxxxxxxxx",
+		"YOUR_PUB_KEY_ID",
 		"/path/to/wxp_pub.pem",
 	)
 	if err != nil {

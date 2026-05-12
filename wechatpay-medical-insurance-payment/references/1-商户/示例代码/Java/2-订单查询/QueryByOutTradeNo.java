@@ -23,10 +23,10 @@ public class QueryByOutTradeNo {
 
   public static void main(String[] args) {
     QueryByOutTradeNo client = new QueryByOutTradeNo(
-      "19xxxxxxxx",
-      "1DDE55AD98Exxxxxxxxxx",
+      "YOUR_MCHID",
+      "YOUR_CERT_SERIAL_NO",
       "/path/to/apiclient_key.pem",
-      "PUB_KEY_ID_xxxxxxxxxxxxx",
+      "YOUR_PUB_KEY_ID",
       "/path/to/wxp_pub.pem"
     );
 

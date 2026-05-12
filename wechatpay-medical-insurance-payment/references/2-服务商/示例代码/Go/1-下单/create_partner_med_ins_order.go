@@ -20,9 +20,9 @@ import (
 func main() {
 	config, err := wxpay_utility.CreateMchConfig(
 		"1900000100",                 // 服务商商户号
-		"1DDE55AD98Exxxxxxxxxx",      // 服务商 API 证书序列号
+		"YOUR_CERT_SERIAL_NO",      // 服务商 API 证书序列号
 		"/path/to/apiclient_key.pem", // 服务商 API 证书私钥路径
-		"PUB_KEY_ID_xxxxxxxxxxxxx",   // 服务商微信支付公钥 ID
+		"YOUR_PUB_KEY_ID",   // 服务商微信支付公钥 ID
 		"/path/to/wxp_pub.pem",       // 服务商微信支付公钥路径
 	)
 	if err != nil {
@@ -36,10 +36,10 @@ func main() {
 	request := &CreateOrderRequest{
 		MixPayType: wxpay_utility.String("CASH_AND_INSURANCE"),
 		OrderType:  wxpay_utility.String("REG_PAY"),
-		Appid:      wxpay_utility.String("wxdace645e0bc2cXXX"),
-		SubAppid:   wxpay_utility.String("wxdace645e0bc2cYYY"),
+		Appid:      wxpay_utility.String("wxYOUR_APPID"),
+		SubAppid:   wxpay_utility.String("wxYOUR_SUB_APPID"),
 		SubMchid:   wxpay_utility.String("1900000109"),
-		SubOpenid:  wxpay_utility.String("o4GgauInH_RCEdvrrNGrntXDuXXX"),
+		SubOpenid:  wxpay_utility.String("oYOUR_OPENID_EXAMPLE"),
 		Payer: &PersonIdentification{
 			Name:     wxpay_utility.String(encryptedName),
 			IdDigest: wxpay_utility.String(encryptedIdDigest),
@@ -70,7 +70,7 @@ func main() {
 			CashReduceType: wxpay_utility.String("DEFAULT_REDUCE_TYPE"),
 		}},
 		CallbackUrl:   wxpay_utility.String("https://www.weixin.qq.com/wxpay/pay.php"),
-		PrepayId:      wxpay_utility.String("wx201410272009395522657a690389285100"),
+		PrepayId:      wxpay_utility.String("wxYOUR_PREPAY_ID"),
 		MedInsTestEnv: wxpay_utility.Bool(false),
 	}
 

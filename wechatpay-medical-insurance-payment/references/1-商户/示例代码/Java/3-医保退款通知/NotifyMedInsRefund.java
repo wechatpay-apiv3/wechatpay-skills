@@ -32,10 +32,10 @@ public class NotifyMedInsRefund {
 
   public static void main(String[] args) {
     NotifyMedInsRefund client = new NotifyMedInsRefund(
-      "19xxxxxxxx",
-      "1DDE55AD98Exxxxxxxxxx",
+      "YOUR_MCHID",
+      "YOUR_CERT_SERIAL_NO",
       "/path/to/apiclient_key.pem",
-      "PUB_KEY_ID_xxxxxxxxxxxxx",
+      "YOUR_PUB_KEY_ID",
       "/path/to/wxp_pub.pem"
     );
 
