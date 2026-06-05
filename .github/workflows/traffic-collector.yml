@@ -1,0 +1,66 @@
+name: Collect Traffic Data
+
+on:
+  schedule:
+    - cron: '0 6 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  collect:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          ref: traffic-data
+
+      - name: Collect clone data
+        env:
+          GH_TOKEN: ${{ secrets.TRAFFIC_TOKEN }}
+        run: |
+          REPO="${{ github.repository }}"
+          FILE="traffic-data.json"
+
+          CLONES_JSON=$(gh api "repos/$REPO/traffic/clones" 2>/dev/null || echo '{"count":0,"uniques":0,"clones":[]}')
+          STARS=$(gh api "repos/$REPO" --jq '.stargazers_count' 2>/dev/null || echo 0)
+          FORKS=$(gh api "repos/$REPO" --jq '.forks_count' 2>/dev/null || echo 0)
+
+          export CLONES_JSON STARS FORKS FILE
+
+          python3 << 'SCRIPT'
+          import json, os
+          from datetime import datetime
+
+          file_path = os.environ.get("FILE", "traffic-data.json")
+
+          if os.path.exists(file_path):
+              with open(file_path, "r") as f:
+                  data = json.load(f)
+          else:
+              data = {"daily_clones": {}}
+
+          clones_json = json.loads(os.environ.get("CLONES_JSON", "{}"))
+
+          for item in clones_json.get("clones", []):
+              date_key = item["timestamp"][:10]
+              data["daily_clones"][date_key] = item["count"]
+
+          data["daily_clones"] = dict(sorted(data["daily_clones"].items()))
+
+          with open(file_path, "w") as f:
+              json.dump(data, f, indent=2, ensure_ascii=False)
+
+          total = sum(data["daily_clones"].values())
+          print(f"✅ Done. Days: {len(data['daily_clones'])}, total clones: {total}")
+          SCRIPT
+
+      - name: Commit and push
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add traffic-data.json
+          git diff --cached --quiet || git commit -m "chore: update traffic data $(date -u +%Y-%m-%d)"
+          git push
