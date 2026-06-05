@@ -22,29 +22,22 @@ jobs:
           GH_TOKEN: ${{ secrets.TRAFFIC_TOKEN }}
         run: |
           REPO="${{ github.repository }}"
-          FILE="traffic-data.json"
-
-          CLONES_JSON=$(gh api "repos/$REPO/traffic/clones" 2>/dev/null || echo '{"count":0,"uniques":0,"clones":[]}')
-          STARS=$(gh api "repos/$REPO" --jq '.stargazers_count' 2>/dev/null || echo 0)
-          FORKS=$(gh api "repos/$REPO" --jq '.forks_count' 2>/dev/null || echo 0)
-
-          export CLONES_JSON STARS FORKS FILE
+          gh api "repos/$REPO/traffic/clones" > /tmp/clones.json 2>/dev/null || echo '{"count":0,"uniques":0,"clones":[]}' > /tmp/clones.json
 
           python3 << 'SCRIPT'
           import json, os
-          from datetime import datetime
 
-          file_path = os.environ.get("FILE", "traffic-data.json")
+          with open("/tmp/clones.json", "r") as f:
+              clones_data = json.load(f)
 
+          file_path = "traffic-data.json"
           if os.path.exists(file_path):
               with open(file_path, "r") as f:
                   data = json.load(f)
           else:
               data = {"daily_clones": {}}
 
-          clones_json = json.loads(os.environ.get("CLONES_JSON", "{}"))
-
-          for item in clones_json.get("clones", []):
+          for item in clones_data.get("clones", []):
               date_key = item["timestamp"][:10]
               data["daily_clones"][date_key] = item["count"]
 
@@ -54,7 +47,7 @@ jobs:
               json.dump(data, f, indent=2, ensure_ascii=False)
 
           total = sum(data["daily_clones"].values())
-          print(f"✅ Done. Days: {len(data['daily_clones'])}, total clones: {total}")
+          print(f"Done. Days: {len(data['daily_clones'])}, total clones: {total}")
           SCRIPT
 
       - name: Commit and push
