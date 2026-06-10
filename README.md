@@ -6,8 +6,8 @@
 
 | Skill | 说明 | 推荐 |
 | --- | --- | --- |
-| [wechatpay-payment-integration](./wechatpay-payment-integration/SKILL.md) | 微信支付全产品接入指引 | ⭐ 推荐 |
-| [wechatpay-product-coupon](./wechatpay-product-coupon/SKILL.md) | 微信支付商品券接入 | |
+| [wechatpay-payment-integration](./wechatpay-payment-integration) | 微信支付全产品接入指引 | ⭐ 推荐 |
+| [wechatpay-product-coupon](./wechatpay-product-coupon) | 微信支付商品券接入 | |
 
 > 💡 **推荐使用 `wechatpay-payment-integration`**：这是微信支付接入的统一入口 Skill，支持产品选型、示例代码、接入质量评估、答疑与排障四大能力，适用于所有微信支付产品的接入场景。
 >
