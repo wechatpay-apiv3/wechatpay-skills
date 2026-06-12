@@ -62,6 +62,8 @@
 
 ## 交流与反馈
 
+欢迎填写问卷，帮助我们持续改进：🔗 [问卷链接](https://wj.qq.com/s2/27008156/afbc/)
+
 在使用过程中遇到问题、有改进建议，或者想和其他开发者交流接入经验，欢迎扫码加入 **微信支付 Skills 交流群**，与官方团队和社区开发者一起讨论：
 
 <img width="400" height="653" alt="4072fac93cc89177cd4cd2bd962e00fb" src="https://github.com/user-attachments/assets/ae6c2aab-d33a-42b4-88e9-a1c4752844ec" />
