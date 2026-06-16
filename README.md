@@ -66,5 +66,7 @@
 
 在使用过程中遇到问题、有改进建议，或者想和其他开发者交流接入经验，欢迎扫码加入 **微信支付 Skills 交流群**，与官方团队和社区开发者一起讨论：
 
-<img width="400" height="653" alt="wecom-temp-163912-2c4af5449820ab21d77a688cae86249f" src="https://github.com/user-attachments/assets/69aff3ce-1abf-4c0b-82fa-2e1cc1fe3448" />
+
+<img width="375" height="375" alt="wecom-temp-163912-2c4af5449820ab21d77a688cae86249f" src="https://github.com/user-attachments/assets/4503e74c-7e4d-4064-86c5-d8e4b6928827" />
+
 
