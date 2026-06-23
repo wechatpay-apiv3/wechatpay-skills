@@ -61,3 +61,4 @@ jobs:
           git add traffic-data.json
           git diff --cached --quiet || git commit -m "chore: update traffic data $(date -u +%Y-%m-%d)"
           git push
+
