@@ -6,17 +6,12 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: write
+  contents: read
 
 jobs:
   collect:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-        with:
-          ref: traffic-data
-
       - name: Collect clone data
         env:
           GH_TOKEN: ${{ secrets.TRAFFIC_TOKEN }}
@@ -24,13 +19,21 @@ jobs:
           REPO="${{ github.repository }}"
           gh api "repos/$REPO/traffic/clones" > /tmp/clones.json 2>/dev/null || echo '{"count":0,"uniques":0,"clones":[]}' > /tmp/clones.json
 
+      - name: Clone private repo
+        env:
+          GH_TOKEN: ${{ secrets.TRAFFIC_TOKEN }}
+        run: |
+          git clone https://x-access-token:${GH_TOKEN}@github.com/zhangpeng319/wechatpay-skills-traffic.git /tmp/private-repo
+
+      - name: Update traffic data
+        run: |
           python3 << 'SCRIPT'
           import json, os
 
           with open("/tmp/clones.json", "r") as f:
               clones_data = json.load(f)
 
-          file_path = "traffic-data.json"
+          file_path = "/tmp/private-repo/traffic-data.json"
           if os.path.exists(file_path):
               with open(file_path, "r") as f:
                   data = json.load(f)
@@ -50,8 +53,9 @@ jobs:
           print(f"Done. Days: {len(data['daily_clones'])}, total clones: {total}")
           SCRIPT
 
-      - name: Commit and push
+      - name: Commit and push to private repo
         run: |
+          cd /tmp/private-repo
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add traffic-data.json
