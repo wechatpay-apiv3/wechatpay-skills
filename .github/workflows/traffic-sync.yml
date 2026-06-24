@@ -19,6 +19,13 @@ jobs:
           REPO="${{ github.repository }}"
           gh api "repos/$REPO/traffic/clones" > /tmp/clones.json 2>/dev/null || echo '{"count":0,"uniques":0,"clones":[]}' > /tmp/clones.json
 
+      - name: Collect star count
+        env:
+          GH_TOKEN: ${{ secrets.TRAFFIC_TOKEN }}
+        run: |
+          REPO="${{ github.repository }}"
+          gh api "repos/$REPO" --jq '.stargazers_count' > /tmp/stars.txt
+
       - name: Clone private repo
         env:
           GH_TOKEN: ${{ secrets.TRAFFIC_TOKEN }}
@@ -29,16 +36,23 @@ jobs:
         run: |
           python3 << 'SCRIPT'
           import json, os
+          from datetime import datetime, timezone
 
           with open("/tmp/clones.json", "r") as f:
               clones_data = json.load(f)
+
+          with open("/tmp/stars.txt", "r") as f:
+              current_stars = int(f.read().strip())
 
           file_path = "/tmp/private-repo/traffic-data.json"
           if os.path.exists(file_path):
               with open(file_path, "r") as f:
                   data = json.load(f)
           else:
-              data = {"daily_clones": {}}
+              data = {"daily_clones": {}, "daily_stars": {}}
+
+          data.setdefault("daily_clones", {})
+          data.setdefault("daily_stars", {})
 
           for item in clones_data.get("clones", []):
               date_key = item["timestamp"][:10]
@@ -46,11 +60,23 @@ jobs:
 
           data["daily_clones"] = dict(sorted(data["daily_clones"].items()))
 
+          today = datetime.now(timezone.utc).strftime("%Y-%m-%d")
+          previous_stars = data.get("stars_total", current_stars)
+          star_increment = max(0, current_stars - previous_stars)
+          data["daily_stars"][today] = star_increment
+          data["stars_total"] = current_stars
+          data["daily_stars"] = dict(sorted(data["daily_stars"].items()))
+
           with open(file_path, "w") as f:
               json.dump(data, f, indent=2, ensure_ascii=False)
 
-          total = sum(data["daily_clones"].values())
-          print(f"Done. Days: {len(data['daily_clones'])}, total clones: {total}")
+          total_clones = sum(data["daily_clones"].values())
+          total_star_increments = sum(data["daily_stars"].values())
+          print(
+              f"Done. Clone days: {len(data['daily_clones'])}, total clones: {total_clones}, "
+              f"star days: {len(data['daily_stars'])}, stars +{star_increment} today "
+              f"(total {current_stars}, cumulative increments: {total_star_increments})"
+          )
           SCRIPT
 
       - name: Commit and push to private repo
@@ -61,4 +87,3 @@ jobs:
           git add traffic-data.json
           git diff --cached --quiet || git commit -m "chore: update traffic data $(date -u +%Y-%m-%d)"
           git push
-
