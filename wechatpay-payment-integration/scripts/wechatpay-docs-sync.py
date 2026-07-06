@@ -3,13 +3,9 @@ wechatpay-docs-sync.py — 微信支付知识库远程同步工具
 
 用法:
     python3 wechatpay-docs-sync.py update  # 检查远程并同步（含首次安装）
-    python3 wechatpay-docs-sync.py --encoding utf-8 update  # 显式锁定 UTF-8（推荐 Windows）
 """
 
-from __future__ import annotations
-
 import json
-import locale
 import os
 import shutil
 import stat
@@ -56,65 +52,6 @@ USER_AGENT = f"{Path(__file__).stem}/{VERSION}"
 IGNORED_FILES = {".DS_Store", "Thumbs.db", "__MACOSX"}
 DOCS_FILE_GLOB = "*.md"
 ZIP_FALLBACK_ENCODING = "cp437"
-DEFAULT_IO_ENCODING = "utf-8"
-
-
-# ==== 编码 ====
-
-
-def _set_windows_console_utf8() -> None:
-    if sys.platform != "win32":
-        return
-    try:
-        import ctypes
-
-        kernel32 = ctypes.windll.kernel32  # type: ignore[attr-defined]
-        kernel32.SetConsoleOutputCP(65001)
-        kernel32.SetConsoleCP(65001)
-    except (OSError, AttributeError):
-        pass
-
-
-def _bootstrap_encoding(encoding: str = DEFAULT_IO_ENCODING) -> None:
-    """锁定脚本 I/O 编码，降低系统区域/终端代码页对中文路径与输出的干扰。"""
-    normalized = (encoding or DEFAULT_IO_ENCODING).strip().lower()
-    os.environ["PYTHONIOENCODING"] = f"{normalized}:replace"
-
-    for stream in (sys.stdout, sys.stderr):
-        if hasattr(stream, "reconfigure"):
-            try:
-                stream.reconfigure(encoding=normalized, errors="replace")
-            except (OSError, ValueError, AttributeError):
-                pass
-
-    for name in ("en_US.UTF-8", "C.UTF-8", "UTF-8"):
-        try:
-            locale.setlocale(locale.LC_ALL, name)
-            break
-        except locale.Error:
-            continue
-
-    if sys.platform == "win32":
-        _set_windows_console_utf8()
-
-
-def _parse_cli_args(argv: list[str]) -> tuple[str, str]:
-    """解析可选 --encoding / -E，返回 (command, encoding)。"""
-    encoding = DEFAULT_IO_ENCODING
-    args = list(argv)
-    i = 0
-    while i < len(args):
-        token = args[i]
-        if token in ("--encoding", "-E") and i + 1 < len(args):
-            encoding = args[i + 1]
-            del args[i : i + 2]
-            continue
-        if token.startswith("--encoding="):
-            encoding = token.split("=", 1)[1]
-            del args[i]
-            continue
-        i += 1
-    return (args[0] if args else "", encoding)
 
 
 # ==== 状态管理 ====
@@ -236,93 +173,17 @@ def _download(dest: Path) -> None:
         print()
 
 
-def _cjk_char_count(text: str) -> int:
-    return sum(1 for ch in text if "\u4e00" <= ch <= "\u9fff")
-
-
-def _try_recover_mojibake(name: str) -> str:
-    """UTF-8 文件名被误按 Latin-1/CP1252 解码时，尝试 latin-1→utf-8 还原。"""
-    try:
-        recovered = name.encode("latin-1").decode("utf-8")
-    except (UnicodeDecodeError, UnicodeEncodeError):
-        return name
-    if _cjk_char_count(recovered) > _cjk_char_count(name):
-        return recovered
-    return name
-
-
-def _decode_zip_filename(info: zipfile.ZipInfo) -> str:
-    """跨平台还原 zip 内文件名（Windows 上 zf.extract 偶发中文乱码，须先修正）。"""
-    name = info.filename.replace("\\", "/")
-    if info.flag_bits & 0x800:
-        return _try_recover_mojibake(name)
-    for encoding in ("utf-8", "gbk", "gb18030"):
-        try:
-            decoded = name.encode(ZIP_FALLBACK_ENCODING).decode(encoding)
-            if _cjk_char_count(decoded) >= _cjk_char_count(name):
-                return decoded
-        except (UnicodeDecodeError, UnicodeEncodeError):
-            continue
-    return _try_recover_mojibake(name)
-
-
-def _win_long_path(path: Path) -> str:
-    """Windows 长路径前缀，绕过 MAX_PATH(260) 限制。"""
-    resolved = str(path.resolve())
-    if resolved.startswith("\\\\?\\"):
-        return resolved
-    if resolved.startswith("\\\\"):
-        return "\\\\?\\UNC\\" + resolved[2:]
-    return "\\\\?\\" + resolved
-
-
-def _mkdir_parents(path: Path) -> None:
-    try:
-        path.mkdir(parents=True, exist_ok=True)
-    except OSError:
-        if sys.platform != "win32":
-            raise
-        os.makedirs(_win_long_path(path), exist_ok=True)
-
-
-def _write_bytes(path: Path, data: bytes) -> None:
-    _mkdir_parents(path.parent)
-    try:
-        path.write_bytes(data)
-    except OSError:
-        if sys.platform != "win32":
-            raise
-        with open(_win_long_path(path), "wb") as fp:
-            fp.write(data)
-
-
-def _extract_zip(archive: Path, dest: Path) -> None:
-    """手动解压 zip，避免 Windows 上 ZipFile.extract 写出乱码中文路径。"""
-    dest.mkdir(parents=True, exist_ok=True)
-    zip_kwargs: dict = {}
-    if sys.version_info >= (3, 11):
-        zip_kwargs["metadata_encoding"] = "utf-8"
-    with zipfile.ZipFile(archive, **zip_kwargs) as zf:
-        for info in zf.infolist():
-            name = _decode_zip_filename(info)
-            if not name or name.startswith("__MACOSX"):
-                continue
-            parts = name.split("/")
-            if any(p in IGNORED_FILES for p in parts):
-                continue
-            target = dest.joinpath(*parts)
-            if name.endswith("/") or info.is_dir():
-                _mkdir_parents(target)
-                continue
-            with zf.open(info) as src:
-                _write_bytes(target, src.read())
-
-
 def _extract(archive: Path, dest: Path) -> None:
-    """解压 zip 或 tar.gz 到 dest。"""
+    """解压 zip 或 tar.gz 到 dest。若 zip 未标记 UTF-8 标志位，做 cp437→utf-8 编码修正。"""
     dest.mkdir(parents=True, exist_ok=True)
     if zipfile.is_zipfile(archive):
-        _extract_zip(archive, dest)
+        with zipfile.ZipFile(archive) as zf:
+            for info in zf.infolist():
+                if not (info.flag_bits & 0x800):
+                    info.filename = info.filename.encode(ZIP_FALLBACK_ENCODING).decode(
+                        "utf-8"
+                    )
+                zf.extract(info, dest)
         return
     try:
         with tarfile.open(archive) as tf:
@@ -341,6 +202,16 @@ def _find_content_root(extract_dir: Path) -> Path:
     if len(items) == 1 and items[0].is_dir():
         return items[0]
     return extract_dir
+
+
+def _win_long_path(path: Path) -> str:
+    """Windows 长路径前缀，绕过 MAX_PATH(260) 限制。"""
+    resolved = str(path.resolve())
+    if resolved.startswith("\\\\?\\"):
+        return resolved
+    if resolved.startswith("\\\\"):
+        return "\\\\?\\UNC\\" + resolved[2:]
+    return "\\\\?\\" + resolved
 
 
 def _chmod_writable(path: Path) -> None:
@@ -555,28 +426,21 @@ def cmd_update() -> None:
 # ==== 入口 ====
 
 _USAGE = """\
-用法: python3 wechatpay-docs-sync.py [--encoding utf-8] update
+用法: python3 wechatpay-docs-sync.py update
 
-  update              检查远程是否有更新；有变化时下载并全量替换本地知识库（含首次安装）
-                      默认 12 小时内不重复检查远程
-  --encoding, -E ENC  锁定脚本 stdout/stderr 编码（默认 utf-8；Windows 推荐显式指定）
-
-示例（Windows）:
-  python wechatpay-docs-sync.py --encoding utf-8 update
-  set PYTHONUTF8=1 && python wechatpay-docs-sync.py update"""
+  update   检查远程是否有更新；有变化时下载并全量替换本地知识库（含首次安装）
+           默认 12 小时内不重复检查远程"""
 
 
-def main(argv: list[str] | None = None) -> None:
-    raw = list(argv if argv is not None else sys.argv[1:])
-    if not raw or raw[0] in ("-h", "--help"):
+def main() -> None:
+    if len(sys.argv) < 2 or sys.argv[1] in ("-h", "--help"):
         print(_USAGE)
         sys.exit(0)
 
-    cmd, encoding = _parse_cli_args(raw)
-    _bootstrap_encoding(encoding)
+    cmd = sys.argv[1]
 
     if cmd != "update":
-        print(f"未识别到有效命令: {cmd or '(空)'}\n")
+        print(f"未识别到有效命令: {cmd}\n")
         print(_USAGE)
         sys.exit(1)
 
