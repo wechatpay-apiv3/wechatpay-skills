@@ -2,20 +2,7 @@
 
 微信支付为 AI Agent 提供了专业的技能包（Skills），将产品的业务知识、代码示例和接入规范以 Agent 可理解的方式组织，使 Agent 能够准确地协助开发者完成微信支付的接入工作。
 
-### Skills 列表
-
-| Skill | 说明 |
-| --- | --- |
-| [wechatpay-payment-integration](./wechatpay-payment-integration/SKILL.md) | 微信支付全产品接入指引 |
-| [wechatpay-product-coupon](./wechatpay-product-coupon/SKILL.md) | 微信支付商品券接入 |
-
-💡 **推荐使用 `wechatpay-payment-integration`**：这是微信支付接入的统一入口 Skill，支持产品选型、示例代码、接入质量评估、答疑与排障四大能力，适用于所有微信支付产品的接入场景。
-
-如需接入**商品券**产品，建议使用专属的 `wechatpay-product-coupon` Skill，其中包含商品券完整的业务知识和代码示例。
-
-### 四大能力
-
-每个 Skill 提供以下四大能力：
+`wechatpay-payment-integration` 是微信支付接入的统一入口 Skill，适用于所有微信支付产品的接入场景，提供以下四大能力：
 
 - **产品选型** — 根据用户业务场景匹配并推荐合适的微信支付产品，并说明选型理由
 - **示例代码** — 根据用户索要的接口和开发语言，给出官方示例代码和接口文档 URL，复制即可运行
@@ -68,5 +55,3 @@
 
 
 <img width="375" height="375" alt="wecom-temp-163912-2c4af5449820ab21d77a688cae86249f" src="https://github.com/user-attachments/assets/4503e74c-7e4d-4064-86c5-d8e4b6928827" />
-
-
