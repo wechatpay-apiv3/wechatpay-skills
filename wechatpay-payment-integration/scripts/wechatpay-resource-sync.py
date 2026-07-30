@@ -26,7 +26,7 @@ SCRIPT_DIR = Path(__file__).resolve().parent  # scripts directory/
 SKILL_DIR = SCRIPT_DIR.parent  # skill directory/
 
 DOCS_URL = "https://wx.gtimg.com/resource/wechatpay_api/wechatpay-docs.zip"
-SKILL_URL = "https://wx.gtimg.com/resource/wechatpay_api/test/skill/wechatpay-payment-integration/bundle.zip"
+SKILL_URL = "https://wx.gtimg.com/resource/wechatpay_api/skill/wechatpay-payment-integration/bundle.zip"
 DOCS_TARGET_DIR = SKILL_DIR / "assets"
 STATE_FILE = SCRIPT_DIR / ".wechatpay-resource-sync-state.json"
 CHECK_INTERVAL_HOURS = 12
