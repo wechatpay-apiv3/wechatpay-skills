@@ -4,8 +4,7 @@
 
 进入本流程前，须确认 **`wechatpay-dev-cli` 已安装且可用**（安装详见 [wechatpay-dev-cli使用说明](./wechatpay-dev-cli使用说明.md)）。
 
-1. **校验 CLI**：执行 `wechatpay-dev-cli --version`，能正常输出版本号（如 `1.0.0`）再继续。
-2. **未安装时**：按使用说明安装（公网 `npm install -g @tenpay/wechatpay-dev-cli`），安装后再次执行 `--version` 确认。
+**未安装时**：按使用说明安装（公网 `npm install -g @tenpay/wechatpay-dev-cli`），安装后再次执行 `--version` 确认。
 
 校验通过后再执行后续的流程。
 
