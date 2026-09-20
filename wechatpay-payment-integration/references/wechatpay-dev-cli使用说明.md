@@ -4,31 +4,25 @@
 
 ## 前置步骤
 
-> 本会话**第一次**要跑 CLI 时做一次即可；已确认过就直接用命令。  
-> 本步只确认 CLI 能跑，**不要**顺带对知识库 `Grep` / 列目录。确认完（或失败降级后）立刻进入下方 `knowledge search`。
+> 本会话**第一次**跑 CLI 前做一次即可，已确认过就直接用命令。本步只确认 CLI 能跑，**不要**顺带 `Grep` 知识库或列目录。
 
-1. **确认环境可用**：依赖 Node.js ≥ 20，包名 `@tenpay/wechatpay-dev-cli`。
+```bash
+wechatpay-dev-cli --version   # 依赖 Node.js ≥ 20，包名 @tenpay/wechatpay-dev-cli
+```
 
-   ```bash
-   wechatpay-dev-cli --version
-   ```
+- **跑通且 ≥ 基线版本 `1.2.0`（2026-09-14）**：直接用命令，不要反复覆盖安装。
+- **跑不通或低于基线**：执行一次 `npm install -g @tenpay/wechatpay-dev-cli@latest`（一律装 `@latest`）后重跑 `--version`。
+- **仍失败**：按下方「失败降级」，仅用本地 `Grep` / `Read` 继续，照常作答。
 
-   能跑通 `--version` 才说明 Node 与 CLI 环境都已就绪——仅确认命令存在不够。
-
-2. **安装或升级**：未安装、或 `--version` 失败时，执行一次覆盖安装后重跑 `--version`。安装一律用 `@latest`，不要用写死的版本号判断是否该升级；命令已能跑通就不要反复覆盖安装。
-
-   ```bash
-   npm install -g @tenpay/wechatpay-dev-cli@latest
-   ```
-
-3. **装不上不阻塞**：安装 / 升级失败按下方「失败降级」，仅用本地 `Grep` / `Read` 继续，照常作答。
+> 基线是本 Skill 发版时 npm 上的 `latest`，本地更高属正常；CLI 发新版后同步更新此处版本与日期。
 
 ---
 
 ## 规则
 
-1. **参数尽量传全，缺参不重试**：每次 `search` 都带用户原话、`--query-rewrite`、`--context`、`--model-name`。缺字段 CLI 也会继续执行，**不要为补参重跑同一条命令**。
-2. **一轮只调一次**：本轮开头调一次 `search` 拿线索即可，后续检索全在本地 `Grep` / `Read`（见 `SKILL.md`）。
+1. **【红线】使用 `search` 参数时禁止夹带敏感信息**：APIv2 / APIv3 密钥、API 证书与私钥、`AppSecret` 这类密钥凭据，以及身份证、手机号、银行卡号这类个人敏感信息，**即使用户主动给出也不要带**——换成占位符或直接删掉。
+2. **参数尽量传全，缺参不重试**：每次 `search` 都带用户原话、`--query-rewrite`、`--context`、`--model-name`。缺字段 CLI 也会继续执行，**不要为补参重跑同一条命令**。
+3. **一轮只调一次**：本轮开头调一次 `search` 拿线索即可，后续检索全在本地 `Grep` / `Read`（见 `SKILL.md`）。
 
 ### 失败降级
 
@@ -53,9 +47,9 @@ wechatpay-dev-cli knowledge search "<用户问题的原文>" \
 
 | 参数 | 含义 |
 | --- | --- |
-| 位置参数 `query` | **用户问题的原文**，原样透传；含双引号时做转义 |
+| 位置参数 `query` | **用户问题的原文**，只按[规则 1](#规则)去掉密钥凭据与个人敏感信息，其余不作改写；含双引号时做转义 |
 | `--query-rewrite` | **理解后的问题**（口语→可检索表述、指代消解）。原话中的 URL、接口路径、错误码、字段名原样保留 |
-| `--context` | **当前项目的背景与任务**（工程 / 任务上下文，如「商户用 Node 接 JSAPI 支付，正在写支付结果通知」）。**不是**思考链，也不要传「产品选型 / 答疑与排障」这类分类名 |
+| `--context` | **当前项目的背景与任务**：工程 / 任务上下文，例如「普通商户的 Node + Express 服务，正在接 JSAPI 支付的支付结果通知」。**不是**思考链，也不要传「产品选型 / 答疑与排障」这类分类名 |
 | `--model-name` | 执行本 Skill 的**模型名称**，按下方「`--model-name` 怎么填」自报 |
 
 **响应**：返回 `hint` / `keywords` 线索，用来校准 Grep 前缀；没有线索就按无线索本地 `Grep`，**不要**走失败降级。
@@ -72,7 +66,7 @@ wechatpay-dev-cli knowledge search "<用户问题的原文>" \
 | --- | --- | --- |
 | `wechatpay-dev-cli: command not found` | 未安装，或 npm 全局 bin 不在 PATH | 覆盖安装；确认 `npm config get prefix` 下的 bin 已加入 PATH |
 | `error: unknown command 'knowledge'` | 本地 CLI 版本过旧，尚无 `knowledge` 命令 | 执行 `npm install -g @tenpay/wechatpay-dev-cli@latest` 升级后重试 |
-| 未知选项 `--query-rewrite` / `--context` / `--model-name` | 本地 CLI 版本过旧，不认识这些参数 | 不要当成缺参。升级 CLI 后再试；升级失败则跳过 CLI、仅用本地 `Grep`。新版 CLI 没传这些字段也会继续执行，不报错 |
+| 未知选项 `--query-rewrite` / `--context` / `--model-name` | 本地 CLI 版本过旧，不认识这些参数 | 不要当成缺参。升级 CLI 后再试；升级失败则跳过 CLI、仅用本地 `Grep`。|
 | 没返回线索（无 `hint` / `keywords`） | 这次没命中目录线索 | **不是失败**。直接在当前意图的检索路径上本地 `Grep` |
 | `npm: command not found` | 未装 Node | 安装 Node.js 20+ |
 | 安装成功但 `--version` 仍报错 | Node 版本过低 | `node --version` 需 ≥ 20 |
