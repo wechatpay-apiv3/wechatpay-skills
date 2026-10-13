@@ -169,7 +169,7 @@ Step 3：获取签名值
 **macOS / Linux 示例**（`mchid=1900007291`）：
 
 ```bash
-bash <SKILL目录>/scripts/bash/extract_and_sign.sh \
+bash <SKILL目录>/scripts/extract_and_sign.sh \
   --filePath "/path/to/apiclient_cert.p12" \
   --password "1900007291" \
   --signString 'GET\n/v3/pay/transactions/id/4200003100202606015015753674?mchid=1900007291\n1554208460\n593BEC0C930BF1AFEB40B4A08C8FB242\n\n'
@@ -178,7 +178,7 @@ bash <SKILL目录>/scripts/bash/extract_and_sign.sh \
 **Windows 示例**（若报编码相关 `ParserError`，改用 `pwsh` 重试）：
 
 ```powershell
-powershell -ExecutionPolicy Bypass -File "<SKILL目录>\scripts\powershell\extract_and_sign.ps1" `
+powershell -ExecutionPolicy Bypass -File "<SKILL目录>\scripts\extract_and_sign.ps1" `
   -FilePath "C:\path\to\apiclient_cert.p12" `
   -Password "1900007291" `
   -SignString 'GET\n/v3/pay/transactions/out-trade-no/202606021034379036?mchid=1900006891\n1780912534\n05E839355D63BAB809D98A41D6210F24\n\n'
