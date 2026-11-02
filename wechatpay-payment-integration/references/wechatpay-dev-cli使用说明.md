@@ -69,7 +69,7 @@ wechatpay-dev-cli knowledge search "<用户问题的原文>" \
 | --- | --- | --- |
 | `wechatpay-dev-cli: command not found` | 未安装，或 npm 全局 bin 不在 PATH | 覆盖安装；确认 `npm config get prefix` 下的 bin 已加入 PATH |
 | `error: unknown command 'knowledge'` | 本地 CLI 版本过旧，尚无 `knowledge` 命令 | 执行 `npm install -g @tenpay/wechatpay-dev-cli@latest` 升级后重试 |
-| 未知选项 `--query-rewrite` / `--context` / `--model-name` | 本地 CLI 版本过旧，不认识这些参数 | 不要当成缺参。升级 CLI 后再试；升级失败则跳过 CLI、仅用本地 `Grep`。|
+| 未知选项 `--query-rewrite` / `--context` / `--model-name` | 本地 CLI 版本过旧，不认识这些参数 | 不要当成缺参。升级 CLI 后再试；升级失败则跳过 CLI、仅用本地 `Grep`。 |
 | 没返回线索（无 `hint` / `keywords`） | 这次没命中目录线索 | **不是失败**。直接在当前意图的检索路径上本地 `Grep` |
 | `npm: command not found` | 未装 Node | 安装 Node.js 20+ |
 | 安装成功但 `--version` 仍报错 | Node 版本过低 | `node --version` 需 ≥ 20 |
