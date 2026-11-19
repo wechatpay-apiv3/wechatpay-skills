@@ -1,4 +1,4 @@
-#
+﻿#
 # 微信支付 APIv3 - P12 证书信息提取与签名工具 (Windows PowerShell 版)
 #
 # 推荐用法（签名时刻生成 TIMESTAMP / NONCE_STR）:
@@ -76,7 +76,7 @@ if ($FilePath -like "/path/to/*" -or $FilePath -like "*\path\to\*" -or $FilePath
     exit 1
 }
 
-if (-not (Test-Path $FilePath)) {
+if (-not (Test-Path -LiteralPath $FilePath)) {
     Write-Host "错误: P12 文件不存在: $FilePath" -ForegroundColor Red
     exit 1
 }
@@ -84,7 +84,7 @@ if (-not (Test-Path $FilePath)) {
 function Test-PemLikeFile([string]$path) {
     $ext = [System.IO.Path]::GetExtension($path).ToLowerInvariant()
     if ($ext -in '.pem', '.crt', '.cer', '.key') { return $true }
-    $first = Get-Content -Path $path -TotalCount 1 -ErrorAction SilentlyContinue
+    $first = Get-Content -LiteralPath $path -TotalCount 1 -ErrorAction SilentlyContinue
     return ($first -like '-----BEGIN*')
 }
 
@@ -99,7 +99,7 @@ if (Test-PemLikeFile $FilePath) {
     Write-WrongCertFormatError $FilePath
 }
 
-$P12FullPath = (Resolve-Path $FilePath).Path
+$P12FullPath = (Resolve-Path -LiteralPath $FilePath).Path
 $pwdHint = "$Url$SignString"
 
 try {
